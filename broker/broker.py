@@ -181,7 +181,6 @@ def requires_auth(f):
 def service_image():
     current_app.config['LOG'].info("service_image called")
     return send_file('assets/batman.png',
-                     attachment_file='logo.png',
                      mimetype='image/png')
 
 
@@ -249,9 +248,9 @@ def service_instances_patch(instance_id):
     '''patch an existing service plan with new config'''
     current_app.config['LOG'].info("service_instances PATCH {}".format(
         instance_id))
-    config = request.json()
+    config = request.get_json()
     current_app.config['LOG'].info("config: {}".format(json.dumps(config,
-                                                                indent=2)))
+                                                                  indent=2)))
     if not config and not (
             (config['service_id'] == dream_service['id']) and
             ((config['plan_id'] == big_dreams['id'] or
