@@ -32,10 +32,15 @@ big_dreams = {
     "description": "A Big Dream",
     "plan_updateable": True,
     "metadata": {
+        "displayName": "Big dreams",
         "bullets": [
             "Dreams are cheap",
             "Even big dreams",
         ],
+        "costs": [
+            {"amount": {"usd": 99.0},
+             "unit": "MONTHLY"},
+        ]
     },
     "free": False,
 }
@@ -45,6 +50,7 @@ small_dreams = {
     "description": "A Small Dream",
     "plan_updateable": True,
     "metadata": {
+        "displayName": "Small dreams",
         "bullets": [
             "Small dreams are barely worth having",
         ],
@@ -57,8 +63,13 @@ dream_service = {
     "id": str(uuid.uuid4()),  # note that this will change with each restart
     "name": "dream",
     "description": "Imaginary Service",
+    "tags": [],
+    "requires": [],
     "bindable": True,
     "plan_updateable": True,
+    "instances_retrievable": True,
+    "bindings_retrievable": True,
+    "allow_context_updates": True,
     "plans": [big_dreams, small_dreams],
     "dashboard_client": {
         "id": "user",
@@ -66,17 +77,16 @@ dream_service = {
         "redirect_uri": 'overwritten_later',
     },
     "metadata": {
-        "listing": {
-            "imageUrl": "",  # while this is documented as here, see below
-            "blurb": "dreams are cheap",
-            "longDescription": "Dream services ranging from free to cheap",
-            },
+        "displayName": "Broker of dreams",
+        "imageUrl": "",
+        "longDescription": "Dream services ranging from free to cheap",
+        "providerDisplayName": "Mr. Sandman",
+        "documentationUrl": "https://sandman.com",
+        "supportUrl": "https://sandman.com/help",
         "bullets": [
             "Dreams of all sizes",
         ],
-        "imageUrl": "",  # where the imageUrl actually works (see above)
-        "displayName": "Broker of dreams",
-        },
+    },
 }
 
 # full service definition
@@ -187,7 +197,7 @@ def service_image():
 @broker_bp.route('/console', methods=['GET'])
 def service_console():
     current_app.config['LOG'].info("service_console called")
-    resp_dict = {'dream_service': dream_service,
+    resp_dict = {'services': dream_service,
                  'instances': instances}
     return make_response(json.dumps(resp_dict, indent=2),
                          200, content_headers)
@@ -266,7 +276,7 @@ def service_instances_patch(instance_id):
     for k in config.keys():
         instances[instance_id][k] = config[k]
     return make_response(json.dumps(instances[instance_id], indent=2),
-                         201, content_headers)
+                         200, content_headers)
 
 
 def service_instances_delete(instance_id):
@@ -322,9 +332,7 @@ def service_bindings_putch(instance_id, binding_id):
     creds = {'username': 'user', 'password': 'pass'}
     x['bindings'][binding_id] = config
     x['bindings']['credentials'] = creds
-    r_ok = 201
-    if request.method == 'PATCH':
-        r_ok = 200
+    r_ok = 200
     return make_response(json.dumps(creds, indent=2),
                          r_ok, content_headers)
 
