@@ -10,6 +10,7 @@ from flask import (Blueprint,
                    make_response,
                    current_app)
 from functools import wraps
+import os
 import json
 import uuid
 
@@ -23,7 +24,15 @@ x_broker_api_major_version = 2
 x_broker_api_minor_version = 10
 x_broker_api_version_name = 'X-Broker-Api-Version'
 
+# set headers to include content-type, and cf application instance details
+vcap_app = json.loads(os.getenv('VCAP_APPLICATION', '{}'))
 content_headers = {'Content-Type': 'text/json'}
+if 'application_id' in vcap_app:
+    instance = os.getenv('CF_INSTANCE_INDEX', '0')
+    content_headers['X-Cf-App-Instance'] = "{}:{}".format(
+        vcap_app['application_id'], instance)
+else:
+    content_headers['X-Cf-App-Instance'] = "0:0"
 
 # broker plans
 big_dreams = {
@@ -131,7 +140,7 @@ def api_version_is_valid(api_version):
     version_data = api_version.split('.')
     if (float(version_data[0]) != x_broker_api_major_version or
         (float(version_data[0]) == x_broker_api_major_version and
-         float(version_data[1]) < x_broker_api_minor_version)):
+         float(version_data[1]) <= x_broker_api_minor_version)):
         return False
     return True
 
@@ -197,8 +206,13 @@ def service_image():
 @broker_bp.route('/console', methods=['GET'])
 def service_console():
     current_app.config['LOG'].info("service_console called")
-    resp_dict = {'services': dream_service,
-                 'instances': instances}
+    h = {}
+    for k in request.headers.keys():
+        h[k] = request.headers.get(k)
+    resp_dict = {
+#        'request headers': h,
+        'services': dream_service,
+        'instances': instances}
     return make_response(json.dumps(resp_dict, indent=2),
                          200, content_headers)
 
