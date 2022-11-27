@@ -140,7 +140,7 @@ def api_version_is_valid(api_version):
     version_data = api_version.split('.')
     if (float(version_data[0]) != x_broker_api_major_version or
         (float(version_data[0]) == x_broker_api_major_version and
-         float(version_data[1]) <= x_broker_api_minor_version)):
+         float(version_data[1]) < x_broker_api_minor_version)):
         return False
     return True
 
