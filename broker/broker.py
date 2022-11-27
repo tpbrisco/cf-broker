@@ -26,7 +26,7 @@ x_broker_api_version_name = 'X-Broker-Api-Version'
 
 # set headers to include content-type, and cf application instance details
 vcap_app = json.loads(os.getenv('VCAP_APPLICATION', '{}'))
-content_headers = {'Content-Type': 'text/json'}
+content_headers = {'Content-Type': 'application/json'}
 if 'application_id' in vcap_app:
     instance = os.getenv('CF_INSTANCE_INDEX', '0')
     content_headers['X-Cf-App-Instance'] = "{}:{}".format(
