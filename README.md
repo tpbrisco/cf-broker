@@ -50,8 +50,5 @@ operation of the broker.  More contributions here are welcome.
 ## To Do
 Contributions welcome here.
 
-I've tried to make this so you can upgrade from "small dreams" to
-"large dreams", but I'm having problems finding the correct (as
-opposed to the documented) location for the field indicating
-"plan\_upgradable" (or "plan\_upgradeable" - the documentation is
-confusing) to even try it out.
+I've tried to make this as complete as possible, contributions to make
+it more complete are welcome!

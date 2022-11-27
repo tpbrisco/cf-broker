@@ -21,13 +21,15 @@ curl ${CURL_FLAGS} -sSf -u user:pass -H "X-Broker-API-Version: 2.10" \
      ${URL}/v2/catalog | \
     jq '.services[] | {service_id: .id, plan_id: .plans[].id}'
 
+# grab the catalog for later reference
+curl ${CURL_FLAGS} -sSf -u user:pass -H "X-Broker-API-Version: 2.10" \
+     ${URL}/v2/catalog | jq -M > /tmp/catalog.json
+
 # get a plan id for provisioning it
-PLAN_ID=$(curl ${CURL_FLAGS} -sSf -u user:pass -H "X-Broker-API-Version: 2.10" \
-	       ${URL}/v2/catalog | \
-	      jq '.services[0].plans[0].id')
-SVC_ID=$(curl ${CURL_FLAGS} -sSf -u user:pass -H "X-Broker-API-Version: 2.10" \
-	      ${URL}/v2/catalog | \
-	     jq '.services[0].id')
+PLAN_ID=$(jq  '.services[0].plans[0].id' /tmp/catalog.json)
+SVC_ID=$(jq  '.services[0].id' /tmp//catalog.json)
+# get a plan for an "update"
+UP_PLAN=$(jq '.services[0].plans[1].id' /tmp/catalog.json)
 
 # note, SVC_ID and PLAN_ID are already wrapped in double-quotes
 echo Create service instance
@@ -54,6 +56,33 @@ then
 else
     echo Found created ID $INSTANCE_ID
 fi
+
+# update it from service[0].plan[0] to service[0].plan[1]
+echo "Updating service instance $SVC_ID from plan $PLAN_ID to $UP_PLAN"
+echo "{\"service_id\": ${SVC_ID}, \"plan_id\": ${UP_PLAN}, \
+     \"previous_values\": {\"plan_id\": ${PLAN_ID}, \"service_id\": ${SVC_ID}}}" \
+     > /tmp/broker_data
+curl ${CURL_FLAGS} -sSf -u user:pass -X PATCH --output /dev/null \
+     -H 'X-Broker-API-Version: 2.10' \
+     -H 'Content-Type: application/json' \
+     -d @/tmp/broker_data \
+     "${URL}/v2/service_instances/$INSTANCE_ID?accepts_incomplete=true"
+rm -f /tmp/broker_data
+
+# check the update went ok
+echo "Checking service plan update"
+curl ${CURL_FLAGS} -sSf -u user:pass -X GET \
+     -H 'X-Broker-API-Version: 2.10' \
+     ${URL}/v2/console | jq '.instances' > /tmp/instances.json
+INST_PLAN=$(jq -M --arg inst $INSTANCE_ID '.[$inst].plan_id' /tmp/instances.json)
+if [[ "$INST_PLAN" != "$UP_PLAN" ]];
+then
+    echo "Discovered plan ($INST_PLAN) is not the updated plan ($UP_PLAN)"
+    exit 1
+else
+    echo "Discovered $UP_PLAN in service instance"
+fi
+rm -f /tmp/instances.json
 
 # bind to a app (the broker itself)
 BIND_ID=$(uuidgen)
