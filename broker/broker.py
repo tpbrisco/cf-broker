@@ -39,7 +39,6 @@ big_dreams = {
     "id": str(uuid.uuid4()),  # note that this will change with each restart
     "name": "big_dreams",
     "description": "A Big Dream",
-    "plan_updateable": True,
     "metadata": {
         "displayName": "Big dreams",
         "bullets": [
@@ -52,12 +51,14 @@ big_dreams = {
         ]
     },
     "free": False,
+    "bindable": True,
+    "binding_rotatable": False,
+    "plan_updateable": True,
 }
 small_dreams = {
     "id": str(uuid.uuid4()),  # note that this will change with each restart
     "name": "small_dreams",
     "description": "A Small Dream",
-    "plan_updateable": True,
     "metadata": {
         "displayName": "Small dreams",
         "bullets": [
@@ -65,6 +66,9 @@ small_dreams = {
         ],
     },
     "free": True,
+    "bindable": True,
+    "binding_rotatable": True,
+    "plan_updateable": True,
 }
 
 # define the service
@@ -75,11 +79,9 @@ dream_service = {
     "tags": [],
     "requires": [],
     "bindable": True,
-    "plan_updateable": True,
     "instances_retrievable": True,
     "bindings_retrievable": True,
     "allow_context_updates": True,
-    "plans": [big_dreams, small_dreams],
     "dashboard_client": {
         "id": "user",
         "secret": "pass",
@@ -96,6 +98,8 @@ dream_service = {
             "Dreams of all sizes",
         ],
     },
+    "plan_updateable": True,
+    "plans": [big_dreams, small_dreams],
 }
 
 # full service definition
