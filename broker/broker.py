@@ -311,7 +311,7 @@ def service_bindings(instance_id, binding_id):
     if request.method == 'GET':
         return service_bindings_get(instance_id, binding_id)
     elif request.method == 'PUT' or request.method == 'PATCH':
-        return service_bindings_putch(instance_id,binding_id)
+        return service_bindings_putch(instance_id, binding_id)
     elif request.method == 'DELETE':
         return service_bindings_delete(instance_id, binding_id)
     err = {"description":
@@ -350,7 +350,10 @@ def service_bindings_putch(instance_id, binding_id):
     creds = {'username': 'user', 'password': 'pass'}
     x['bindings'][binding_id] = config
     x['bindings']['credentials'] = creds
-    r_ok = 200
+    if request.method == 'PUT':
+        r_ok = 201
+    else:
+        r_ok = 200
     return make_response(json.dumps(creds, indent=2),
                          r_ok, content_headers)
 
