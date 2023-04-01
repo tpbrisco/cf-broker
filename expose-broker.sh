@@ -1,9 +1,10 @@
 set -e
-# set broker URL if defined
-if [[ -z "$BROKER_URL" ]]; then
-    echo "set BROKER_URL for the broker"
+
+if [[ -z "BROKER_URL" ]]; then
+    echo "BROKER_URL should be set to the ... url"
     exit 1
 fi
+
 echo "Using broker URL ${BROKER_URL}"
 
 # use "--space-scoped" if not admin
