@@ -214,7 +214,6 @@ def service_console():
     for k in request.headers.keys():
         h[k] = request.headers.get(k)
     resp_dict = {
-#        'request headers': h,
         'services': dream_service,
         'instances': instances}
     return make_response(json.dumps(resp_dict, indent=2),
