@@ -28,11 +28,24 @@ a service, and place it in the marketplace.  The "hide-broker" will
 remove it from the marketplace.
 
 Note that re-pushing the application destroys the "data structure" and
-GUIDs in teh application -- which will confuse the marketplace if
+GUIDs in the application -- which will confuse the marketplace if
 bindings are already in place.  The hide-broker/expose-broker are
 intended to mitigate issues that will arise from re-pushes.
 Investigate the cf-cli purge-service-binding/purge-service-offering to
 recover from re-pushes.
+
+## Known working functionality
+- create-service - service and plans work
+- service - show service information
+- un/bind-service - binding/unbinding works as expected
+- upgrade-service - a no-op, but succeeds
+- rename-service - rename service instance
+- update-service - switch between plans
+- service-key - fixed, null values
+- service-keys - fixed, null values
+- delete-service-key - works
+- delete-service - remove service entry
+- purge-service-offering - handy when you upgrade the broker without deleting service instance
 
 ## Testing
 A simple "test-broker.sh" script is intended to verify correct
